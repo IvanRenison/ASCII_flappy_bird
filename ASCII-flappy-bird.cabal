@@ -17,7 +17,15 @@ cabal-version:       >=1.10
 
 executable ASCII-flappy-bird
   main-is:             FlappyBird/Main.hs
-  -- other-modules:
+  other-modules:       ASCIIscreen.ASCIIscreen
+                     , ASCIIscreen.ASCIIscreenEdit
+                     , ASCIIscreen.ASCIIscreenIO
+                     , ASCIIscreen.ListZipper
+                     , FlappyBird.FlappyBirdGraphics
+                     , FlappyBird.FlappyBirdLogic
+                     , Helpers.FoldableHelper
+                     , Helpers.FunctionHelper
+                     , Helpers.TimeHelper
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13
                      , flow >=1.0 && <1.1
