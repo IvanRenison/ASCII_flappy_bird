@@ -1,6 +1,4 @@
-module FlappyBird.FlappyBirdGraphics (
-    drawTube
-) where
+module FlappyBird.FlappyBirdGraphics () where
 
 import Flow ( (.>) )
 
