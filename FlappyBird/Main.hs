@@ -1,3 +1,5 @@
+{-# LANGUAGE NondecreasingIndentation #-}
+
 import Control.Concurrent ( threadDelay )
 import System.Console.ANSI
     ( getTerminalSize, hideCursor, showCursor )
@@ -65,12 +67,12 @@ gameLoop game = do
             buffer <- getBuffer
             if '\EOT' `elem` buffer then exitGame game
             else do
-                let jump = notNull buffer
-                    game' = updateGame deltaTime jump game
-                rePrintInASCIIscreen game'
-                if hasEnded game' then exitGame game'
-                else do
-                    loop time game'
+            let jump = notNull buffer
+                game' = updateGame deltaTime jump game
+            rePrintInASCIIscreen game'
+            if hasEnded game' then exitGame game'
+            else do
+            loop time game'
 
 
 
@@ -85,13 +87,7 @@ getBuffer = do
     b <- hReady stdin
     if not b then return ""
     else do
-        c <- getChar
-        cs <- getBuffer
-        return (c:cs)
-
-
-
-
-
-
+    c <- getChar
+    cs <- getBuffer
+    return (c:cs)
 
