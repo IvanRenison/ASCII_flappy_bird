@@ -1,14 +1,22 @@
+{- HLINT ignore "Use camelCase" -}
+
 module ASCIIscreen.ASCIIscreen (
     Width, Hight, Size,
     X_coord, Y_coord, Coords,
     ASCIIscreen, size, width, hight,
     newASCIIscreen,
-    putAt, editAt,
+    putAt, s_putAt, editAt, s_editAt,
     Screenable(..),
     showAsASCIIscreen
 ) where
 
-import Data.Sequence.Internal ()
+{-
+s_f functions are versions of f for using with State monad
+
+s_f args == modify . f args
+-}
+
+import Control.Monad.Trans.State ( modify, State )
 
 
 import ASCIIscreen.ListZipper ( editPos, newListZipper, toList, ListZipper ) 
@@ -43,12 +51,15 @@ instance Show ASCIIscreen where
 newASCIIscreen :: Size -> ASCIIscreen
 newASCIIscreen (w, h) = ASCIIscreen (w, h) $ newListZipper $ replicate h $ newListZipper $ replicate w ' '
 
-{- putAr:
+{- putAt:
     It replaces the char at position (x, y) be c
     If the position (x, y) is outside of the screen it doesn't do anything
 -}
 putAt :: Char -> Coords -> ASCIIscreen -> ASCIIscreen
 putAt c = editAt $ const c
+
+s_putAt :: Char -> Coords -> State ASCIIscreen ()
+s_putAt c = modify . putAt c
 
 {- editAt:
     Edits the screen in position (x, y) applying f
@@ -59,6 +70,8 @@ editAt f (x, y) s@(ASCIIscreen (w, h) lz)
     | x < 0 || x >= w || y < 0 || y >= h = s -- Case in witch the point its outside de screen
     | otherwise = ASCIIscreen (w, h) $ editPos y (editPos x f) lz
 
+s_editAt :: (Char -> Char) -> Coords -> State ASCIIscreen ()
+s_editAt f = modify . editAt f
 
 
 class Screenable g where
