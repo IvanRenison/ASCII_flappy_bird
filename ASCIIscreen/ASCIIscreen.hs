@@ -3,7 +3,7 @@
 module ASCIIscreen.ASCIIscreen (
     Width, Hight, Size,
     X_coord, Y_coord, Coords,
-    ASCIIscreen, size, width, hight,
+    ASCIIscreen, size, getSize, width, getWidth, hight, getHight,
     newASCIIscreen,
     putAt, s_putAt, editAt, s_editAt,
     Screenable(..),
@@ -16,7 +16,7 @@ s_f functions are versions of f for using with State monad
 s_f args == modify . f args
 -}
 
-import Control.Monad.Trans.State ( modify, State )
+import Control.Monad.Trans.State ( modify, state, State )
 
 
 import ASCIIscreen.ListZipper ( editPos, newListZipper, toList, ListZipper ) 
@@ -35,11 +35,20 @@ data ASCIIscreen = ASCIIscreen Size (ListZipper (ListZipper Char))
 size :: ASCIIscreen -> Size
 size (ASCIIscreen s _) = s
 
+getSize :: State ASCIIscreen Size
+getSize = state $ \screen -> (size screen, screen)
+
 width :: ASCIIscreen -> Width
 width = fst . size
 
+getWidth :: State ASCIIscreen Width
+getWidth = state $ \screen -> (width screen, screen)
+
 hight :: ASCIIscreen -> Hight
 hight = snd . size
+
+getHight :: State ASCIIscreen Hight
+getHight = state $ \screen -> (hight screen, screen)
 
 instance Show ASCIIscreen where
     show (ASCIIscreen _ lz) = unlines . map toList . toList $ lz
