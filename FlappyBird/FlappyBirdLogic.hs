@@ -5,6 +5,7 @@ module FlappyBird.FlappyBirdLogic (
     hasEnded, screenWidth
 ) where
 
+import Control.Monad.Trans.State
 import Data.Fixed ( Pico )
 import Data.Time.Clock ( nominalDiffTimeToSeconds, NominalDiffTime )
 import System.Random ( randomRs, RandomGen )
@@ -92,49 +93,52 @@ newGame seed (w, h) =
         standardSpeed = fromIntegral w * 0.25
 
 
-
-
 updateGame :: NominalDiffTime -> Jump -> GameStatus -> GameStatus
-updateGame deltaTime jump =
+updateGame deltaTime jump = execState $ s_updateGame deltaTime jump
+
+s_updateGame :: NominalDiffTime -> Jump -> State GameStatus ()
+s_updateGame deltaTime jump = do
     updatePositions
-    . deleteUnnecessaryTubes
-    . checkCollisions
+    deleteUnnecessaryTubes
+    checkCollisions
     {- Tree steps:
         • Update positions
         • Delete no more visible tubes
         • Check collisions
     -}
     where
-        updatePositions :: GameStatus -> GameStatus
-        updatePositions game = game {
-            flappyPos_y = flappyPos_y game + _verticalSpeed * deltaTime_,
-            firstTube_x = firstTube_x game + horizontalSpeed game * deltaTime_,
-            verticalSpeed = _verticalSpeed
-        }
-            where
-                deltaTime_ = nominalDiffTimeToSeconds deltaTime
+        updatePositions :: State GameStatus ()
+        updatePositions = modify $ \game -> 
+            let deltaTime_ = nominalDiffTimeToSeconds deltaTime
                 _verticalSpeed
                     | jump      = jumpSpeed game
                     | otherwise = verticalSpeed game - gravity game * deltaTime_
+            in
+            game {
+                flappyPos_y = flappyPos_y game + _verticalSpeed * deltaTime_,
+                firstTube_x = firstTube_x game + horizontalSpeed game * deltaTime_,
+                verticalSpeed = _verticalSpeed
+            }
 
-        deleteUnnecessaryTubes :: GameStatus -> GameStatus
-        deleteUnnecessaryTubes game = game {
-            firstTube_x = _firstTube_x,
-            holesTubes_y = _holesTubes_y
-        }
-            where
-                (_firstTube_x, _holesTubes_y)
+        deleteUnnecessaryTubes :: State GameStatus ()
+        deleteUnnecessaryTubes = modify $ \game ->
+            let (_firstTube_x, _holesTubes_y)
                     | firstTube_x_ <= - halfTubeWidth_ = (firstTube_x_ + offsetTubes_, tail holesTubes_y_)
                     | otherwise                        = (firstTube_x_               ,      holesTubes_y_)
                 firstTube_x_ = firstTube_x game
                 holesTubes_y_ = holesTubes_y game
                 halfTubeWidth_ = fromIntegral $ halfTubeWidth game
                 offsetTubes_ = fromIntegral $ offsetTubes game
+            in
+            game {
+                firstTube_x = _firstTube_x,
+                holesTubes_y = _holesTubes_y
+            }
 
-        checkCollisions :: GameStatus -> GameStatus
-        checkCollisions game
-            | hasCollisions game = game {isAlive = False} 
-            | otherwise          = game
+        checkCollisions :: State GameStatus ()
+        checkCollisions = modify $ \game ->
+            if hasCollisions game then game {isAlive = False} 
+                                  else game
 
 
 {- hasCollisions:
