@@ -7,7 +7,6 @@ module FlappyBird.FlappyBirdLogic (
 
 import Data.Fixed ( Pico )
 import Data.Time.Clock ( nominalDiffTimeToSeconds, NominalDiffTime )
-import Flow ( (.>) )
 import System.Random ( randomRs, RandomGen )
 
 import ASCIIscreen.ASCIIscreen ( Coords, Hight, Size, Width, Y_coord )
@@ -98,8 +97,8 @@ newGame seed (w, h) =
 updateGame :: NominalDiffTime -> Jump -> GameStatus -> GameStatus
 updateGame deltaTime jump =
     updatePositions
-    .> deleteUnnecessaryTubes
-    .> checkCollisions
+    . deleteUnnecessaryTubes
+    . checkCollisions
     {- Tree steps:
         • Update positions
         • Delete no more visible tubes
