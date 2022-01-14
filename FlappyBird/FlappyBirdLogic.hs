@@ -5,7 +5,7 @@ module FlappyBird.FlappyBirdLogic (
     hasEnded, screenWidth
 ) where
 
-import Data.Fixed (Pico)
+import Data.Fixed ( Pico )
 import Data.Time.Clock ( nominalDiffTimeToSeconds, NominalDiffTime )
 import Flow ( (.>) )
 import System.Random ( randomRs, RandomGen )

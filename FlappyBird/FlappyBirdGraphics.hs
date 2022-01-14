@@ -43,9 +43,6 @@ drawTubes :: GameStatus -> State ASCIIscreen ()
 drawTubes game =
     forM_ tubesCenters $ \(x, y) -> 
         drawTube (halfTubeWidth game) (halfHoleTubeWide game) (x, y)
---    applyWhile ((<= screenWidth game) . fst) tubesCenters (\(x, y) ->
---        execState $ drawTube (halfTubeWidth game) (halfHoleTubeWide game) (x, y)
---    )
     where
         _holesTubes_y = holesTubes_y game :: [Y_coord]
         _firstTube_x = round $ firstTube_x game :: X_coord
