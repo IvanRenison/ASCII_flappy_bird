@@ -1,3 +1,5 @@
+{- HLINT ignore "Use camelCase" -}
+
 module FlappyBird.FlappyBirdLogic (
     Jump, Distance, Speed, Acceleration,
     GameStatus(..),
@@ -33,6 +35,8 @@ data GameStatus = GameStatus {
 
     isAlive :: Bool,
 
+    distanceFromStart :: Distance,
+
     -- Don't change during gameplay
     holesTubes_y :: [Y_coord],        -- list of the hights of the center of the holes of the tubes
 
@@ -60,6 +64,8 @@ newGame seed (w, h) =
         firstTube_x = fromIntegral $ w `div` 2,
 
         isAlive = True,
+
+        distanceFromStart = 0,
 
         holesTubes_y = _holesTubes_y (h `div` 2) $ randomRs (-maxDiffTubes, maxDiffTubes) seed,
 
@@ -94,7 +100,7 @@ newGame seed (w, h) =
 
 
 updateGame :: NominalDiffTime -> Jump -> GameStatus -> GameStatus
-updateGame deltaTime jump = execState $ s_updateGame deltaTime jump
+updateGame deltaTime = execState . s_updateGame deltaTime
 
 s_updateGame :: NominalDiffTime -> Jump -> State GameStatus ()
 s_updateGame deltaTime jump = do
@@ -113,11 +119,13 @@ s_updateGame deltaTime jump = do
                 _verticalSpeed
                     | jump      = jumpSpeed game
                     | otherwise = verticalSpeed game - gravity game * deltaTime_
+                advancedDistance = - horizontalSpeed game * deltaTime_
             in
             game {
                 flappyPos_y = flappyPos_y game + _verticalSpeed * deltaTime_,
-                firstTube_x = firstTube_x game + horizontalSpeed game * deltaTime_,
-                verticalSpeed = _verticalSpeed
+                firstTube_x = firstTube_x game - advancedDistance,
+                verticalSpeed = _verticalSpeed,
+                distanceFromStart = distanceFromStart game + advancedDistance
             }
 
         deleteUnnecessaryTubes :: State GameStatus ()
