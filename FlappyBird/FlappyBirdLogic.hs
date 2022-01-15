@@ -4,10 +4,11 @@ module FlappyBird.FlappyBirdLogic (
     Jump, Distance, Speed, Acceleration,
     GameStatus(..),
     newGame, updateGame,
-    hasEnded, screenWidth
+    hasEnded,
+    screenWidth, screenHight
 ) where
 
-import Control.Monad.Trans.State
+import Control.Monad.Trans.State ( execState, modify, State )
 import Data.Fixed ( Pico )
 import Data.Time.Clock ( nominalDiffTimeToSeconds, NominalDiffTime )
 import System.Random ( randomRs, RandomGen )
@@ -40,6 +41,8 @@ data GameStatus = GameStatus {
     -- Don't change during gameplay
     holesTubes_y :: [Y_coord],        -- list of the hights of the center of the holes of the tubes
 
+    starting_firstTube_x :: Distance, -- needed for the the calculation of the points
+
     screenSize :: Size,
 
     horizontalSpeed :: Speed,   
@@ -61,13 +64,15 @@ newGame seed (w, h) =
         flappyPos_x = fromIntegral _offsetTubes,
         flappyPos_y = _flappyPos_y,
         verticalSpeed = 0,
-        firstTube_x = fromIntegral $ w `div` 2,
+        firstTube_x = _starting_firstTube_x,
 
         isAlive = True,
 
         distanceFromStart = 0,
 
         holesTubes_y = _holesTubes_y (h `div` 2) $ randomRs (-maxDiffTubes, maxDiffTubes) seed,
+
+        starting_firstTube_x = _starting_firstTube_x,
 
         screenSize = (w, h),
 
@@ -94,6 +99,8 @@ newGame seed (w, h) =
             where
                 y_newTube = y_lastTube + diffTube
         _holesTubes_y _ _ = undefined -- These should never be de case
+
+        _starting_firstTube_x = fromIntegral $ w `div` 2
 
         _halfHoleTubeWide = h `div` 6
         standardSpeed = fromIntegral w * 0.25

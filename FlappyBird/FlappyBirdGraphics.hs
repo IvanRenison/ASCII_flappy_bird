@@ -2,6 +2,8 @@ module FlappyBird.FlappyBirdGraphics () where
 
 import Control.Monad.Extra ( forM_ )
 import Control.Monad.Trans.State ( execState, State )
+import Data.Fixed ( Pico )
+import Numeric.Natural ( Natural )
 
 
 import ASCIIscreen.ASCIIscreen
@@ -12,14 +14,14 @@ import ASCIIscreen.ASCIIscreen
       X_coord,
       Hight,
       Width,
-      newASCIIscreen,
-      getHight )
+      getHight,
+      newASCIIscreen )
 import ASCIIscreen.ASCIIscreenEdit
-    ( s_putRectangle, s_putRectangleWithEdges )
+    ( s_putRectangle, s_putRectangleWithEdges, s_putStringIn )
 import FlappyBird.FlappyBirdLogic
-    ( GameStatus(flappySize, flappyPos_y, flappyPos_x,
-                 halfHoleTubeWide, halfTubeWidth, offsetTubes, firstTube_x,
-                 holesTubes_y, screenSize),
+    ( GameStatus(screenSize, holesTubes_y, firstTube_x, halfTubeWidth,
+                 halfHoleTubeWide, flappyPos_x, flappyPos_y, flappySize,
+                 distanceFromStart, starting_firstTube_x, offsetTubes),
       screenWidth )
 
 
@@ -62,10 +64,22 @@ drawFlappy game = s_putRectangle '@' (x_pos, y_pos - fSize) (x_pos + fSize, y_po
         fSize = flappySize game
 
 
+printPoints :: GameStatus -> State ASCIIscreen ()
+printPoints game = do
+    s_putStringIn (show points) (1, 1)
+    where
+        points = toNatural $ (distanceFromStart game - starting_firstTube_x game) / fromIntegral (offsetTubes game) + 1
+        toNatural :: Pico -> Natural
+        toNatural n
+            | n < 0 = 0
+            | otherwise = ceiling n
+
+
 drawGame :: GameStatus -> State ASCIIscreen ()
 drawGame game = do
     drawTubes game
     drawFlappy game
+    printPoints game
 
 
 
