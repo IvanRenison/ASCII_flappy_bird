@@ -23,9 +23,6 @@ executable ASCII-flappy-bird
                      , ASCIIscreen.ListZipper
                      , FlappyBird.FlappyBirdGraphics
                      , FlappyBird.FlappyBirdLogic
-                     , Helpers.FoldableHelper
-                     , Helpers.FunctionHelper
-                     , Helpers.TimeHelper
   -- other-extensions:
   build-depends:       base >=4.12
                      , deepseq >=1.4 && <1.5

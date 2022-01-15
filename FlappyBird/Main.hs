@@ -8,10 +8,12 @@ import System.Random ( newStdGen )
 import Data.Maybe ( fromJust, isNothing )
 import Data.List.Extra ( notNull )
 import Data.Time.Clock
-    ( NominalDiffTime, diffUTCTime, getCurrentTime, UTCTime ) 
+    ( nominalDiffTimeToSeconds,
+      diffUTCTime,
+      getCurrentTime,
+      NominalDiffTime,
+      UTCTime )
 import Data.Tuple ( swap )
-
-import Helpers.TimeHelper ( nominalDiffTimeToMicroSeconds )
 
 import ASCIIscreen.ASCIIscreenIO
     ( printInASCIIscreen, rePrintInASCIIscreen ) 
@@ -91,3 +93,6 @@ getBuffer = do
     cs <- getBuffer
     return (c:cs)
 
+
+nominalDiffTimeToMicroSeconds :: NominalDiffTime -> Int 
+nominalDiffTimeToMicroSeconds time = round $ nominalDiffTimeToSeconds time * 1000000
