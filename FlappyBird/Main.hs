@@ -62,7 +62,8 @@ gameLoop game = do
         loop :: UTCTime -> GameStatus -> IO ()
         loop lastTime game = do
             time <- getCurrentTime
-            let deltaTime = time `diffUTCTime` lastTime :: NominalDiffTime
+            let _deltaTime = time `diffUTCTime` lastTime :: NominalDiffTime
+                deltaTime = if _deltaTime > 1 then 1 else _deltaTime
                 minTimePerFrame = 1/60 :: NominalDiffTime -- realToFrac to a NominalDiffTime treats numbers as seconds
                 delay = max (minTimePerFrame - deltaTime) 0
             threadDelay $ nominalDiffTimeToMicroSeconds delay
