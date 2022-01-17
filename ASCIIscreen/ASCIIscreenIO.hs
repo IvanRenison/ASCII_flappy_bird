@@ -1,5 +1,3 @@
-{- Iván Renison -}
-
 module ASCIIscreen.ASCIIscreenIO (
     printASCIIscreen, rePrintASCIIscreen,
     printInASCIIscreen, rePrintInASCIIscreen
